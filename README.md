@@ -54,7 +54,7 @@ And log in again.
 git clone https://github.com/iceman3k/stremio-docker-nvidia.git
 cd stremio-docker-nvidia
 
-# Edit compose.yaml if needed, then run:
+# Edit docker-compose.yaml if needed, then run:
 docker compose up -d
 
 ```

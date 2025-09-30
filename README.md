@@ -56,6 +56,7 @@ cd stremio-docker-nvidia
 
 # Edit compose.yaml if needed, then run:
 docker compose up -d
+
 ```
 The compose file includes common settings like `NO_CORS: 1` and `AUTO_SERVER_URL: 1`.
 
@@ -188,9 +189,10 @@ The WebPlayer will be available at `https://your.custom.domain:8080`.
 To update to the latest version, simply run:
 
 ```bash
-docker stop stremio-docker-nvidia
-docker rm stremio-docker-nvidia
-docker pull iceman3k/stremio-docker-nvidia:latest
+~~docker stop stremio-docker-nvidia~~
+~~docker rm stremio-docker-nvidia~~
+~~docker pull iceman3k/stremio-docker-nvidia:latest~~
+docker build --no-cache -t stremio-docker-nvidia:latest .
 ```
 
 And then run your `docker run` or `docker compose up -d` command again.
@@ -199,8 +201,8 @@ And then run your `docker run` or `docker compose up -d` command again.
 
 ### FFMPEG
 
-We build our own ffmpeg from the jellyfin repo (version 4.4.1-4), which includes:
-- Hardware acceleration support for Nvidia (NVENC), Intel, and AMD (VAAPI)
+We build our own ffmpeg from the jellyfin repo (version 7.1.2-1), which includes:
+- Hardware acceleration support for Nvidia (NVENC/NVDEC), Intel, and AMD (VAAPI)
 - Multiple codec support (H.264, HEVC, VP9, etc.)
 - Optimized for streaming workloads
 
@@ -222,6 +224,9 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all # Use 'all' or specific GPU ids like '0,1'
+      NVIDIA_DRIVER_CAPABILITIES: all
 ```
 
 **Docker CLI:**

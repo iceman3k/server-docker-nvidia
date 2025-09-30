@@ -8,13 +8,15 @@ The Docker images in this repository bundle stremio-server, ffmpeg and web playe
 
 ***
 CURRENTLY, YOU HAVE TO BUILD THIS IMAGE FROM DOCKERFILE or DOCKER COMPOSE BUILD \
-docker build --no-cache -t stremio-docker-nvenc:latest . \
-References to iceman3k/stremio-docker-nvenc:latest do not currently work. My hope is they won't have to. I made a comment here in hopes that Stremio will fix the core issue https://github.com/Stremio/stremio-bugs/issues/1401#issuecomment-3334778243 which will eventually filter its way into the tsaridas/stremio-docker project.
+docker build --no-cache -t stremio-docker-nvidia:latest . \
+References to iceman3k/stremio-docker-nvidia:latest do not currently work. My hope is they won't have to. I made a comment here in hopes that Stremio will fix the core issue https://github.com/Stremio/stremio-bugs/issues/1401#issuecomment-3334778243 which will eventually filter its way into the tsaridas/stremio-docker project.
 ***
 
-!!!
-This build uses Cuda 12.3 to configure Jellyfin-FFMPEG. Therefore, only the following GPU series will work: GTX 1000, RTX 2000-4000, Tesla P100, A100.
-!!!
+***
+This build uses Cuda 13.0.1 to configure Jellyfin-FFMPEG. Therefore, only the following GPU series will work: RTX 2000-4000, A100, H100, H200. \
+The image can be changed to nvidia/cuda:12.3.0-devel-ubuntu22.04 to support GTX 1000 series, Tesla P100, v100. \
+You should probably run the same version of Cuda Toolkit as the version of runtime you are running, e.g. nvidia/cuda:13.0.1-runtime-ubuntu22.04, or nvidia/cuda:12.8.0-runtime-ubuntu22.04 for GTX 1000 series.
+***
 
 ## Features
 
@@ -49,8 +51,8 @@ And log in again.
 **Option A: Using Docker Compose (Recommended)**
 ```bash
 # Clone the repository
-git clone https://github.com/iceman3k/stremio-docker-nvenc.git
-cd stremio-docker-nvenc
+git clone https://github.com/iceman3k/stremio-docker-nvidia.git
+cd stremio-docker-nvidia
 
 # Edit compose.yaml if needed, then run:
 docker compose up -d
@@ -60,13 +62,13 @@ The compose file includes common settings like `NO_CORS: 1` and `AUTO_SERVER_URL
 **Option B: Using Docker Run**
 ```bash
 docker run -d \
-  --name=stremio-docker-nvenc \
+  --name=stremio-docker-nvidia \
   -e NO_CORS=1 \
   -e AUTO_SERVER_URL=1 \
   -v ./stremio-data:/root/.stremio-server \
   -p 8080:8080/tcp \
   --restart unless-stopped \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 
 The Web UI will now be available on `http://<YOUR_SERVER_IP>:8080`. The streaming server will be auto-configured for you from the URL of the browser you are using to open it.
@@ -111,11 +113,11 @@ This is the easiest option and works on your local network without needing a pub
 
 ```bash
 docker run -d \
-  --name=stremio-docker-nvenc \
+  --name=stremio-docker-nvidia \
   -e NO_CORS=1 \
   -e AUTO_SERVER_URL=1 \
   -p 8080:8080 \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 Access Stremio at `http://<YOUR_LAN_IP>:8080`.
 
@@ -128,11 +130,11 @@ This option automatically gets a certificate for a `*.stremio.rocks` subdomain a
 
 ```bash
 docker run -d \
-  --name=stremio-docker-nvenc \
+  --name=stremio-docker-nvidia \
   -e IPADDRESS=0.0.0.0 \
   -e AUTO_SERVER_URL=1 \
   -p 8080:8080 \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 The container will generate a certificate and an A record for your public IP. To find the FQDN, look for a `.pem` file in your mounted volume (`~/.stremio-server`).
 
@@ -153,12 +155,12 @@ This is useful for accessing Stremio via HTTPS on your local network. It generat
 4.  Run the container:
     ```bash
     docker run -d \
-      --name=stremio-docker-nvenc \
+      --name=stremio-docker-nvidia \
       -e IPADDRESS=192.168.1.10 \
       -e AUTO_SERVER_URL=1 \
       -p 8080:8080 \
       -v ./stremio-data:/root/.stremio-server \
-      iceman3k/stremio-docker-nvenc:latest
+      iceman3k/stremio-docker-nvidia:latest
     ```
 5.  Access Stremio at `https://192-168-1-10.519b6502d940.stremio.rocks:8080`.
 
@@ -171,13 +173,13 @@ If you have your own domain and SSL certificate, you can use them directly.
 
 ```bash
 docker run -d \
-  --name=stremio-docker-nvenc \
+  --name=stremio-docker-nvidia \
   -e DOMAIN=your.custom.domain \
   -e CERT_FILE=certificate.pem \
   -e AUTO_SERVER_URL=1 \
   -v ./stremio-data:/root/.stremio-server \
   -p 8080:8080 \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 The WebPlayer will be available at `https://your.custom.domain:8080`.
 
@@ -186,9 +188,9 @@ The WebPlayer will be available at `https://your.custom.domain:8080`.
 To update to the latest version, simply run:
 
 ```bash
-docker stop stremio-docker-nvenc
-docker rm stremio-docker-nvenc
-docker pull iceman3k/stremio-docker-nvenc:latest
+docker stop stremio-docker-nvidia
+docker rm stremio-docker-nvidia
+docker pull iceman3k/stremio-docker-nvidia:latest
 ```
 
 And then run your `docker run` or `docker compose up -d` command again.
@@ -229,7 +231,7 @@ services:
     --gpus=all \
     -e NVIDIA_VISIBLE_DEVICES=all \
     -e NVIDIA_DRIVER_CAPABILITIES=all \
-    stremio-docker-nvenc:latest
+    stremio-docker-nvidia:latest
 ```
 
 **Support for Intel/AMD GPU Transcoding (VAAPI)**
@@ -250,7 +252,7 @@ services:
 docker run -d \
   # ... your other flags
   --device /dev/dri:/dev/dri \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 
 ### Builds
@@ -269,7 +271,7 @@ Builds are created for the following architectures:
 #- `nightly`: Builds daily from the development branch of the web player.
 #- `vX.X.X`: Specific release versions.
 
-#Images are hosted on [Docker Hub](https://hub.docker.com/r/iceman3k/stremio-docker-nvenc).
+#Images are hosted on [Docker Hub](https://hub.docker.com/r/iceman3k/stremio-docker-nvidia).
 
 ### Customizing Local Storage
 
@@ -279,7 +281,7 @@ Stremio's web app stores settings in the browser's local storage. You can pre-co
 docker run -d \
   # ... your other flags
   -v /path/to/your/localStorage.json:/srv/stremio-server/build/localStorage.json \
-  iceman3k/stremio-docker-nvenc:latest
+  iceman3k/stremio-docker-nvidia:latest
 ```
 
 ### Shell

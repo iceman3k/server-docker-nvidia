@@ -34,4 +34,4 @@ services:
     ports:
       - 8080:8080/tcp
     volumes:
-      - ./stremio-data:/root/.stremio-server
+      - ./stremio-data:/root/.stremio-server # Change ./stremio-data to your specified config folder. Something like ~/stremio/config or C:\Users\<Username>\stremio\config

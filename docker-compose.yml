@@ -1,19 +1,37 @@
-version: "3.3"
 services:
-  server:
+  stremio:
+    image: stremio-docker-nvidia:latest
     container_name: stremio_server
-    image: stremio/server:latest
-    ports:
-      - 11470:11470
-      - 12470:12470
-    volumes:
-      - /bin/ffmpeg:/bin/ffmpeg:ro
-      - /bin/ffprobe:/bin/ffprobe:ro
-    networks:
-      - proxy
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     environment:
-      - FFMPEG_BIN=/bin/ffmpeg
-      - FFPROBE_BIN=/bin/ffprobe
-      # Uncomment and set value as needed
-      #- APP_PATH=""
-      #- NO_CORS=0 
+      PUID: 1000 # Set to your user ID, e.g., 1000
+      PGID: 1000 # Set to your user and group ID, e.g., 1000:1000
+      TZ: America/New_York # Set to your timezone, e.g., America/New_York
+      NVIDIA_VISIBLE_DEVICES: all # Use 'all' or specific GPU ids like '0,1'
+      NVIDIA_DRIVER_CAPABILITIES: all # Use 'compute,video,graphics' for more restricted access
+      LIBRARY_MODE_NVIDIA: wsl  # Set to 'wsl' for WSL2 or 'linux' for bare metal
+      NO_CORS: 1 # Set to '1' to disable server's cors.
+      AUTO_SERVER_URL: 0 # Recommended for auto-configuration. Default is 0
+      CASTING_DISABLED: 1 # Set to '1' to disable casting. This should be set to 1 to avoid SSDP errors. 
+      #IPADDRESS:  # Set to your private LAN IP for Scenario 3, e.g., 192.168.1.10
+      #SERVER_URL:  # Manually sets the streaming server URL. http://192.168.1.10:11470/
+      #WEBUI_LOCATION:  # Sets the redirect page for web player.
+      #WEBUI_INTERNAL_PORT: 8080 # Sets the port inside the docker container for the web player.
+      #APP_PATH:  # Set for custom path for stremio server.
+      #DOMAIN:  # Set for custom domain for stremio server.
+      #CERT_FILE:  # Set for custom certificate path.
+      #USERNAME:  # Set for custom username for http simple authentication.
+      #PASSWORD:  # Set for custom password for http simple authentication.
+      #DISABLE_CACHING:  # Set to '1' to disable caching for server.
+      #DISABLE_CACHING: 1  # Prevent caching issues
+    ports:
+      - 8080:8080/tcp
+    volumes:
+      - ./stremio-data:/root/.stremio-server

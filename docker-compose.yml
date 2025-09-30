@@ -21,7 +21,7 @@ services:
       AUTO_SERVER_URL: 0 # Recommended for auto-configuration. Default is 0
       CASTING_DISABLED: 1 # Set to '1' to disable casting. This should be set to 1 to avoid SSDP errors. 
       #IPADDRESS:  # Set to your private LAN IP for Scenario 3, e.g., 192.168.1.10
-      #SERVER_URL:  # Manually sets the streaming server URL. http://192.168.1.10:11470/
+      #SERVER_URL:  # Manually sets the streaming server URL. http://192.168.1.10:11470/ -or https://192.168.1.10:12470. Default is https://app.strem.io/shell-v4.4/
       #WEBUI_LOCATION:  # Sets the redirect page for web player.
       #WEBUI_INTERNAL_PORT: 8080 # Sets the port inside the docker container for the web player.
       #APP_PATH:  # Set for custom path for stremio server.
